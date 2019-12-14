@@ -6,6 +6,8 @@
   },
   "rules": {
     "quotemark": [true, "single"],
+    "no-console": [true, "debug"],
+    "no-empty": [true, "allow-empty-catch", "allow-empty-functions"],
     "member-access": [false],
     "ordered-imports": [false],
     "max-line-length": [true, 150],

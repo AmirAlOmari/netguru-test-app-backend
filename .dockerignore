@@ -1,3 +1,10 @@
+docker-compose.*.yml
+*.dockerfile
+
+##################
+# FROM GITIGNORE #
+##################
+
 # compiled output
 /dist
 /node_modules
