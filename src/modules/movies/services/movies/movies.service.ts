@@ -80,19 +80,31 @@ export class MoviesService {
     return movie;
   }
 
+  async update(movie: DocumentType<Movies>, updateMovieDto) {
+    const proms = [this.updateById(movie._id, updateMovieDto)];
+
+    return await Promise.all(proms);
+  }
+
+  async updateById(movieId: string | Types.ObjectId, updateMovieDto) {
+    const updatedMovie = await this.moviesModel.findByIdAndUpdate(movieId, updateMovieDto, { new: true }).exec();
+
+    return updatedMovie;
+  }
+
   async updateByIdWithQuery(movieId: string | Types.ObjectId, updateMovieDoc: any) {
     const updatedMovie = await this.moviesModel.findByIdAndUpdate(movieId, updateMovieDoc, { new: true }).exec();
 
     return updatedMovie;
   }
 
-  async updateById(movieId: string | Types.ObjectId) {}
+  async remove(movie: DocumentType<Movies>) {
+    const proms = [this.removeById(movie._id)];
+
+    return await Promise.all(proms);
+  }
 
   async removeById(movieId: string | Types.ObjectId) {
     return await this.moviesModel.findByIdAndDelete(movieId).exec();
-  }
-
-  async remove(movie: DocumentType<Movies>) {
-    await this.removeById(movie._id);
   }
 }
