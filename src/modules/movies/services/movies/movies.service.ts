@@ -1,12 +1,15 @@
-import { Injectable, Type } from '@nestjs/common';
+import { Injectable, Type, forwardRef, Inject } from '@nestjs/common';
 import { ReturnModelType, DocumentType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
-import { Types } from 'mongoose';
+import { DocumentQuery, Types } from 'mongoose';
 import { ExtApiNames } from '../../../ext-apis/enums/ext-api-names/ext-api-names.enum';
 import { ExtApiAdapterFactory } from '../../../ext-apis/factories/ext-api-adapter/ext-api-adapter.factory';
+import { Comments } from '../../../comments/models/comments/comments.model';
+import { CommentsService } from '../../../comments/services/comments/comments.service';
 import { CreateMovieDto } from '../../dtos/create-movie/create-movie.dto';
-import { FindParams } from '../../interfaces/find-params/find-params.interface';
-import { findParamsDefault } from '../../constants/find-params/find-params.default.constant';
+import { FindParamPopulate } from '../../enums/find-all-param-populate/find-all-param-populate.enum';
+import { FindParams } from '../../interfaces/find-all-params/find-all-params.interface';
+import { findParamsDefault } from '../../constants/find-all-params/find-all-params.default.constant';
 import { Movies } from '../../models/movies/movies.model';
 
 @Injectable()
@@ -14,22 +17,29 @@ export class MoviesService {
   constructor(
     @InjectModel(Movies) private readonly moviesModel: ReturnModelType<typeof Movies>,
     private readonly extApiAdapterFactory: ExtApiAdapterFactory,
+    @Inject(forwardRef(() => CommentsService)) private readonly commentsService: CommentsService,
   ) {}
 
-  appendSearchQuery(search, moviesQuery) {
-    const searchRegex = new RegExp(`${search}`, 'gi');
+  appendSearchQuery(
+    search: string = '',
+    moviesQuery: DocumentQuery<Array<DocumentType<Movies>>, DocumentType<Movies>>,
+  ) {
+    const searchRegex = new RegExp(`${search}`, 'gi'); // TODO: improve regexp
+
+    // moviesQuery.equals({ title: searchRegex });
 
     moviesQuery.where('title', searchRegex);
   }
 
   async getAll({
+    populate = findParamsDefault.populate,
     sortBy = findParamsDefault.sortBy,
     sortDir = findParamsDefault.sortDir,
     skip = findParamsDefault.skip,
     limit = findParamsDefault.limit,
     search = findParamsDefault.search,
   }: FindParams = findParamsDefault) {
-    const moviesQuery = this.moviesModel.find({});
+    const moviesQuery = this.moviesModel.find();
 
     if (search) {
       this.appendSearchQuery(search, moviesQuery);
@@ -49,6 +59,18 @@ export class MoviesService {
 
     const allMovies = await moviesQuery.exec();
 
+    await Promise.all(
+      allMovies.map(async movie => {
+        if (populate.includes(FindParamPopulate.Comments)) {
+          movie.comments = await Promise.all(
+            movie.comments.map(async commentId =>
+              this.commentsService.getById(commentId as Types.ObjectId, { recursive: true }),
+            ),
+          );
+        }
+      }),
+    );
+
     return allMovies;
   }
 
@@ -59,7 +81,7 @@ export class MoviesService {
       this.appendSearchQuery(search, moviesQuery);
     }
 
-    const allCount = await moviesQuery.count().exec();
+    const allCount = await moviesQuery.countDocuments().exec();
 
     return allCount;
   }
@@ -67,7 +89,25 @@ export class MoviesService {
   async getById(movieId: string | Types.ObjectId) {
     const movie = await this.moviesModel.findById(movieId).exec();
 
+    // if (populate.includes(FindParamPopulate.Comments)) {
+    movie.comments = await Promise.all(
+      movie.comments.map(async commentId =>
+        this.commentsService.getById(commentId as Types.ObjectId, { recursive: true }),
+      ),
+    );
+    // }
+
     return movie;
+  }
+
+  async addCommentToMovie(comment: DocumentType<Comments>, movie: DocumentType<Movies>) {
+    const updatedMovie = await this.moviesModel.findByIdAndUpdate(
+      movie._id,
+      { $push: { comments: comment._id } },
+      { new: true },
+    );
+
+    return updatedMovie;
   }
 
   async createFromThirdParty(createMovieDto: CreateMovieDto) {

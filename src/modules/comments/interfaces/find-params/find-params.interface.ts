@@ -3,5 +3,4 @@ export interface FindParams {
   sortDir?: string;
   skip?: number;
   limit?: number;
-  search?: string;
 }

@@ -11,8 +11,10 @@ import {
   IsDate,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Comments } from '../../../comments/models/comments/comments.model';
 import { Ratings } from '../ratings/ratings.model';
 
+@modelOptions({ schemaOptions: { timestamps: true } })
 export class Movies {
   @IsString()
   @prop()
@@ -111,4 +113,7 @@ export class Movies {
   @IsString()
   @prop({ required: false })
   website?: string;
+
+  @arrayProp({ itemsRef: 'Comments' })
+  comments: Array<Ref<Comments>>;
 }
