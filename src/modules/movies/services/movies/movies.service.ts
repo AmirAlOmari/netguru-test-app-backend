@@ -16,7 +16,7 @@ export class MoviesService {
     private readonly extApiAdapterFactory: ExtApiAdapterFactory,
   ) {}
 
-  appendSearchWhereQuery(search, moviesQuery) {
+  appendSearchQuery(search, moviesQuery) {
     const searchRegex = new RegExp(`${search}`, 'gi');
 
     moviesQuery.where('title', searchRegex);
@@ -32,7 +32,7 @@ export class MoviesService {
     const moviesQuery = this.moviesModel.find({});
 
     if (search) {
-      this.appendSearchWhereQuery(search, moviesQuery);
+      this.appendSearchQuery(search, moviesQuery);
     }
 
     if (sortBy && sortDir) {
@@ -56,7 +56,7 @@ export class MoviesService {
     const moviesQuery = this.moviesModel.find({});
 
     if (search) {
-      this.appendSearchWhereQuery(search, moviesQuery);
+      this.appendSearchQuery(search, moviesQuery);
     }
 
     const allCount = await moviesQuery.count().exec();
