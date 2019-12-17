@@ -13,11 +13,15 @@ RUN npm install
 # The instructions for builder stage
 FROM node:12-alpine as builder
 
-COPY --from=node-modules-builder node_modules node_modules
-
 COPY . .
 
+COPY --from=node-modules-builder node_modules ./node_modules
+
+RUN npm i -g @nestjs/cli typescript
+
 RUN npm run build
+
+RUN npm prune --production
 
 # The insuctions for the final stage
 FROM node:12-alpine
@@ -25,8 +29,8 @@ FROM node:12-alpine
 WORKDIR /usr/src/app
 
 COPY package*.json ./
-COPY --from=builder node_modules node_modules
-COPY --from=builder dist dist
+COPY --from=builder node_modules ./node_modules
+COPY --from=builder dist ./dist
 
 EXPOSE 3000
 
