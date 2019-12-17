@@ -1,4 +1,5 @@
 import { Typegoose, Ref, modelOptions, arrayProp, prop } from '@typegoose/typegoose';
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsString,
   IsArray,
@@ -10,13 +11,14 @@ import {
   ValidateNested,
   IsDate,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
 
 export class Ratings {
+  @ApiProperty()
   @IsString()
   @prop()
   source: string;
 
+  @ApiProperty()
   @IsString()
   @prop()
   value: string;

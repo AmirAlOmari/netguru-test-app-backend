@@ -1,1 +1,1 @@
-// export * from './swagger-initializer.class';
+export * from './swagger-initializer.class';

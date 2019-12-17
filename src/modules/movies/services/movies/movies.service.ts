@@ -7,6 +7,7 @@ import { ExtApiAdapterFactory } from '../../../ext-apis/factories/ext-api-adapte
 import { Comments } from '../../../comments/models/comments/comments.model';
 import { CommentsService } from '../../../comments/services/comments/comments.service';
 import { CreateMovieDto } from '../../dtos/create-movie/create-movie.dto';
+import { CommentMovieDto } from '../../dtos/comment-movie/comment-movie.dto';
 import { FindParamPopulate } from '../../enums/find-all-param-populate/find-all-param-populate.enum';
 import { FindParams } from '../../interfaces/find-all-params/find-all-params.interface';
 import { findParamsDefault } from '../../constants/find-all-params/find-all-params.default.constant';
@@ -89,13 +90,13 @@ export class MoviesService {
   async getById(movieId: string | Types.ObjectId) {
     const movie = await this.moviesModel.findById(movieId).exec();
 
-    // if (populate.includes(FindParamPopulate.Comments)) {
-    movie.comments = await Promise.all(
-      movie.comments.map(async commentId =>
-        this.commentsService.getById(commentId as Types.ObjectId, { recursive: true }),
-      ),
-    );
-    // }
+    if (movie) {
+      movie.comments = await Promise.all(
+        movie.comments.map(async commentId =>
+          this.commentsService.getById(commentId as Types.ObjectId, { recursive: true }),
+        ),
+      );
+    }
 
     return movie;
   }
@@ -127,12 +128,14 @@ export class MoviesService {
   }
 
   async updateById(movieId: string | Types.ObjectId, updateMovieDto) {
-    const updatedMovie = await this.moviesModel.findByIdAndUpdate(movieId, updateMovieDto, { new: true }).exec();
+    const updatedMovie = await this.moviesModel
+      .findByIdAndUpdate(movieId, { $set: { ...updateMovieDto, updatedAt: new Date() } }, { new: true })
+      .exec();
 
     return updatedMovie;
   }
 
-  async updateByIdWithQuery(movieId: string | Types.ObjectId, updateMovieDoc: any) {
+  async updateByIdWithDoc(movieId: string | Types.ObjectId, updateMovieDoc: any) {
     const updatedMovie = await this.moviesModel.findByIdAndUpdate(movieId, updateMovieDoc, { new: true }).exec();
 
     return updatedMovie;
@@ -146,5 +149,11 @@ export class MoviesService {
 
   async removeById(movieId: string | Types.ObjectId) {
     return await this.moviesModel.findByIdAndDelete(movieId).exec();
+  }
+
+  async comment(movie: DocumentType<Movies>, commentMovieDto: CommentMovieDto) {
+    const comment = await this.commentsService.create({ ...commentMovieDto, movieId: movie._id }, movie);
+
+    return comment;
   }
 }

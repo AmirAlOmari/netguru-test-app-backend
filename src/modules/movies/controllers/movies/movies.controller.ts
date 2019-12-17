@@ -11,15 +11,20 @@ import {
   Delete,
 } from '@nestjs/common';
 import { DocumentType } from '@typegoose/typegoose';
+import { ApiTags, ApiExtraModels } from '@nestjs/swagger';
 import { IsObjectIdPipe } from '../../../common/pipes/is-object-id/is-object-id.pipe';
 import { DefaultValuePipe } from '../../../common/pipes/default-value/default-value.pipe';
 import { ExtApiMovieNotFound } from '../../../ext-apis/errors/ext-api-movie-not-found/ext-api-movie-not-found.error';
 import { CreateMovieDto } from '../../dtos/create-movie/create-movie.dto';
+import { CommentMovieDto } from '../../dtos/comment-movie/comment-movie.dto';
 import { Movies } from '../../models/movies/movies.model';
+import { Ratings } from '../../models/ratings/ratings.model';
 import { FindMovieByIdPipe } from '../../pipes/find-movie-by-id/find-movie-by-id.pipe';
 import { MoviesService } from '../../services/movies/movies.service';
 
 @Controller('movies')
+@ApiExtraModels(Movies, Ratings)
+@ApiTags('movies')
 export class MoviesController {
   constructor(private readonly moviesService: MoviesService) {}
 
@@ -86,7 +91,7 @@ export class MoviesController {
   async update(
     @Param('movieId', IsObjectIdPipe) movieId: string,
     @Param('movieId', IsObjectIdPipe, FindMovieByIdPipe) movie: DocumentType<Movies>,
-    @Body() updateMovieDto,
+    @Body() updateMovieDto, // TODO: provide validation dto
   ) {
     if (!movie) {
       throw new NotFoundException();
@@ -112,6 +117,23 @@ export class MoviesController {
 
     return {
       data: removedMovie,
+    };
+  }
+
+  @Post(':movieId/comment')
+  async comment(
+    @Param('movieId', IsObjectIdPipe) movieId: string,
+    @Param('movieId', IsObjectIdPipe, FindMovieByIdPipe) movie: DocumentType<Movies>,
+    @Body() commentMovieDto: CommentMovieDto,
+  ) {
+    if (!movie) {
+      throw new NotFoundException();
+    }
+
+    const comment = await this.moviesService.comment(movie, commentMovieDto);
+
+    return {
+      data: comment,
     };
   }
 }

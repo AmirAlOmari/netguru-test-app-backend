@@ -11,17 +11,21 @@ import {
   Delete,
 } from '@nestjs/common';
 import { DocumentType } from '@typegoose/typegoose';
+import { ApiTags, ApiExtraModels } from '@nestjs/swagger';
 import { IsObjectIdPipe } from '../../../common/pipes/is-object-id/is-object-id.pipe';
 import { DefaultValuePipe } from '../../../common/pipes/default-value/default-value.pipe';
 import { Movies } from '../../../movies/models/movies/movies.model';
 import { FindMovieByIdPipe } from '../../../movies/pipes/find-movie-by-id/find-movie-by-id.pipe';
 import { CreateCommentDto } from '../../dtos/create-comment/create-comment.dto';
+import { UpdateCommentDto } from '../../dtos/udpate-comment/update-comment.dto';
 import { ReplyCommentDto } from '../../dtos/reply-comment/reply-comment.dto';
 import { Comments } from '../../models/comments/comments.model';
 import { FindCommentByIdPipe } from '../../pipes/find-comment-by-id/find-comment-by-id.pipe';
 import { CommentsService } from '../../services/comments/comments.service';
 
 @Controller('comments')
+@ApiExtraModels(Comments)
+@ApiTags('comments')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
@@ -82,38 +86,38 @@ export class CommentsController {
     };
   }
 
-  // @Patch(':commentId')
-  // async update(
-  //   @Param('commentId', IsObjectIdPipe) commentId: string,
-  //   @Param('commentId', IsObjectIdPipe, FindCommentByIdPipe) comment: DocumentType<Comments>,
-  //   @Body() updateCommentDto,
-  // ) {
-  //   if (!comment) {
-  //     throw new NotFoundException();
-  //   }
+  @Patch(':commentId')
+  async update(
+    @Param('commentId', IsObjectIdPipe) commentId: string,
+    @Param('commentId', IsObjectIdPipe, FindCommentByIdPipe) comment: DocumentType<Comments>,
+    @Body() updateCommentDto: UpdateCommentDto,
+  ) {
+    if (!comment) {
+      throw new NotFoundException();
+    }
 
-  //   const updatedComment = await this.commentsService.update(comment, updateCommentDto);
+    const updatedComment = await this.commentsService.update(comment, updateCommentDto);
 
-  //   return {
-  //     data: updatedComment,
-  //   };
-  // }
+    return {
+      data: updatedComment,
+    };
+  }
 
-  // @Delete(':commentId')
-  // async remove(
-  //   @Param('commentId', IsObjectIdPipe) commentId: string,
-  //   @Param('commentId', IsObjectIdPipe, FindCommentByIdPipe) comment: DocumentType<Comments>,
-  // ) {
-  //   if (!comment) {
-  //     throw new NotFoundException();
-  //   }
+  @Delete(':commentId')
+  async remove(
+    @Param('commentId', IsObjectIdPipe) commentId: string,
+    @Param('commentId', IsObjectIdPipe, FindCommentByIdPipe) comment: DocumentType<Comments>,
+  ) {
+    if (!comment) {
+      throw new NotFoundException();
+    }
 
-  //   const removedComment = await this.commentsService.remove(comment);
+    const removedComment = await this.commentsService.remove(comment);
 
-  //   return {
-  //     data: removedComment,
-  //   };
-  // }
+    return {
+      data: removedComment,
+    };
+  }
 
   @Post(':commentId/reply')
   async reply(
