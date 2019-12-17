@@ -13,6 +13,7 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
+    "start:heroku": "npm run build && npm run start:prod",
     "format-old": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" --ignore-path ./.prettierignore --loglevel error ./**",
     "lint": "tslint -p tsconfig.json -c tslint.json",
