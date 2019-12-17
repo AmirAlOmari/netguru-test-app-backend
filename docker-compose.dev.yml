@@ -1,0 +1,32 @@
+version: "3.7"
+services:
+  app:
+    env_file:
+      - "./dev.env"
+    restart: always
+    build:
+      context: ./
+      dockerfile: ./dev.dockerfile
+    command: npm run start:debug
+    ports:
+      - "9222:9222"
+      - "9229:9229"
+      - "3000:3000"
+    volumes:
+      - app:/usr/src/app/data
+    links:
+      - "mongo"
+  mongo:
+    image: "mongo:4"
+    volumes:
+      - "mongo:/data/db"
+    ports:
+      - "27017:27017"
+
+volumes:
+  app:
+    external: true
+    name: netguru-test-app_app-vol
+  mongo:
+    external: true
+    name: netguru-test-app_mongo-vol

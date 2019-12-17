@@ -1,0 +1,29 @@
+version: "3.7"
+services:
+  app:
+    env_file:
+      - "./staging.env"
+    restart: always
+    build:
+      context: ./
+      dockerfile: ./staging.dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - app:/usr/src/app/data
+    links:
+      - "mongo"
+  mongo:
+    image: "mongo:4"
+    volumes:
+      - "mongo:/data/db"
+    ports:
+      - "27017:27017"
+
+volumes:
+  app:
+    external: true
+    name: netguru-test-app_app-vol
+  mongo:
+    external: true
+    name: netguru-test-app_mongo-vol
