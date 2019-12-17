@@ -4,9 +4,9 @@ import { configDefault } from '../../constants/config/config.default.constant';
 
 @Injectable()
 export class ConfigService {
-  private readonly configDefault: IConfig = configDefault;
+  public readonly configDefault: IConfig = configDefault;
 
-  private readonly config: IConfig = this.configDefault;
+  public readonly config: IConfig = this.configDefault;
 
   get<T = keyof IConfig>(key: T) {
     return this.config[key as any];

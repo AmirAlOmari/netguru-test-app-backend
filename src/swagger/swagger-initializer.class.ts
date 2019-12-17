@@ -20,7 +20,7 @@ export interface ISwaggerDocumentInitConfig {
 export type TSwaggerDocumentInitConfigs = ISwaggerDocumentInitConfig[];
 
 export class SwaggerInitializer {
-  constructor(private readonly app: INestApplication) {
+  constructor(public readonly app: INestApplication) {
     this.injectOtherDependencies();
   }
 
@@ -30,7 +30,7 @@ export class SwaggerInitializer {
 
   private configService: ConfigService;
 
-  private readonly swaggerDocumentInitConfigs: TSwaggerDocumentInitConfigs = [
+  public readonly swaggerDocumentInitConfigs: TSwaggerDocumentInitConfigs = [
     {
       name: 'Main',
       createDocumentOptionsBuilder: ({ configService }) => {

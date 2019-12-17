@@ -3,7 +3,7 @@ import { CommentsService } from '../../services/comments/comments.service';
 
 @Injectable()
 export class FindCommentByIdPipe implements PipeTransform {
-  constructor(private readonly commentsService: CommentsService) {}
+  constructor(public readonly commentsService: CommentsService) {}
 
   async transform(commentId: string, metadata: ArgumentMetadata) {
     const comment = await this.commentsService.getById(commentId);

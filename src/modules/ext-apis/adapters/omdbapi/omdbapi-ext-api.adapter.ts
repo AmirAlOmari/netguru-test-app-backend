@@ -10,7 +10,7 @@ import { ExtApiMovieNotFound } from '../../errors/ext-api-movie-not-found/ext-ap
 
 @Injectable()
 export class OmdbapiExtApiAdapter extends AbstractExtApiAdapter<OriginalMovie> {
-  constructor(private readonly httpService: HttpService, private readonly configService: ConfigService) {
+  constructor(public readonly httpService: HttpService, public readonly configService: ConfigService) {
     super();
   }
 

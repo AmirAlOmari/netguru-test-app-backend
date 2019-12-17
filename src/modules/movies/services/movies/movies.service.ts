@@ -16,9 +16,9 @@ import { Movies } from '../../models/movies/movies.model';
 @Injectable()
 export class MoviesService {
   constructor(
-    @InjectModel(Movies) private readonly moviesModel: ReturnModelType<typeof Movies>,
-    private readonly extApiAdapterFactory: ExtApiAdapterFactory,
-    @Inject(forwardRef(() => CommentsService)) private readonly commentsService: CommentsService,
+    @InjectModel(Movies) public readonly moviesModel: ReturnModelType<typeof Movies>,
+    public readonly extApiAdapterFactory: ExtApiAdapterFactory,
+    @Inject(forwardRef(() => CommentsService)) public readonly commentsService: CommentsService,
   ) {}
 
   appendSearchQuery(
