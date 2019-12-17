@@ -1,10 +1,10 @@
-import { NestApplication } from '@nestjs/core';
-import { SwaggerModule, SwaggerDocument, SwaggerBaseConfig, DocumentBuilder } from '@nestjs/swagger';
+import { INestApplication } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigModule } from '../modules/config/config.module';
 import { ConfigService } from '../modules/config/services/config/config.service';
 
 export interface TSwaggerDocumentInitConfigCreateOptionsFnArg {
-  app: NestApplication;
+  app: INestApplication;
   configService: ConfigService;
 }
 
@@ -20,7 +20,7 @@ export interface ISwaggerDocumentInitConfig {
 export type TSwaggerDocumentInitConfigs = ISwaggerDocumentInitConfig[];
 
 export class SwaggerInitializer {
-  constructor(private readonly app: NestApplication) {
+  constructor(private readonly app: INestApplication) {
     this.injectOtherDependencies();
   }
 
@@ -35,21 +35,15 @@ export class SwaggerInitializer {
       name: 'Main',
       createDocumentOptionsBuilder: ({ configService }) => {
         const documentOptionsBuilder = new DocumentBuilder()
-          .setTitle('Joker Taxi Backend API')
+          .setTitle('Netguru Test Backend App API')
           .setDescription(
             `
-            Admin Auth:
-              - Local:
-                Authorization: Bearer not-so-secret
-
-              - Production:
-                Authorization: Basic dGVzdDp0ZXN0
-                X-Authorization: Bearer not-so-secret
+            Test app
           `,
           )
           .setVersion('0.0.1')
-          .addTag('files')
-          .addTag('toys');
+          .addTag('movies')
+          .addTag('comments');
 
         return documentOptionsBuilder;
       },
@@ -65,7 +59,7 @@ export class SwaggerInitializer {
       configService: this.configService,
     });
 
-    documentOptionsBuilder.setSchemes(...(schemes as any)).setBasePath(basePath);
+    // documentOptionsBuilder.setSchemes(...(schemes as any)).setBasePath(basePath);
 
     const documentOptions = documentOptionsBuilder.build();
 
@@ -80,11 +74,11 @@ export class SwaggerInitializer {
     const basePath = configNodeEnv === 'production' ? '/api' : '/';
     const schemes = configNodeEnv === 'production' ? ['https'] : ['http', 'https'];
 
-    this.swaggerDocumentInitConfigs.forEach(swaggerDocumentInitConfig => {
+    swaggerDocumentInitConfigs.forEach(swaggerDocumentInitConfig => {
       const document = this.createDocumentFromConfig(swaggerDocumentInitConfig, { basePath, schemes });
-      const docuemntEndPoint = swaggerDocumentInitConfig.name === 'Main' ? '' : `/${swaggerDocumentInitConfig.name}`;
+      const documentEndPoint = swaggerDocumentInitConfig.name === 'Main' ? '' : `/${swaggerDocumentInitConfig.name}`;
 
-      SwaggerModule.setup(`/swagger${docuemntEndPoint}`, this.app, document);
+      SwaggerModule.setup(`/swagger${documentEndPoint}`, this.app, document);
     });
   }
 

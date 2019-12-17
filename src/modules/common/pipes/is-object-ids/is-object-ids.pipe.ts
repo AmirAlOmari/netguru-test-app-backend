@@ -2,22 +2,18 @@ import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from
 import { Types } from 'mongoose';
 
 @Injectable()
-export class IsObjectIdsPipe implements PipeTransform {
-  transform(values: string[], metadata: ArgumentMetadata) {
+export class IsObjectIdPipe implements PipeTransform {
+  transform(value: string, metadata: ArgumentMetadata) {
     try {
-      const objectIds = values.forEach(value => {
-        const isValidObjectId = Types.ObjectId.isValid(value);
+      const isValidObjectId = Types.ObjectId.isValid(value);
 
-        if (!isValidObjectId) {
-          throw new BadRequestException();
-        }
+      if (!isValidObjectId) {
+        throw new BadRequestException();
+      }
 
-        const objectId = new Types.ObjectId(value);
+      const objectId = new Types.ObjectId(value);
 
-        return objectId;
-      });
-
-      return objectIds;
+      return objectId;
     } catch (error) {
       throw new BadRequestException();
     }
