@@ -26,7 +26,7 @@ import { MoviesService } from '../../services/movies/movies.service';
 @ApiExtraModels(Movies, Ratings)
 @ApiTags('movies')
 export class MoviesController {
-  constructor(private readonly moviesService: MoviesService) {}
+  constructor(public readonly moviesService: MoviesService) {}
 
   @Post()
   async create(@Body() createMovieDto: CreateMovieDto) {

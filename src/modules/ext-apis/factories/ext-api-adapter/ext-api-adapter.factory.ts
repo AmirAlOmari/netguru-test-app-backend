@@ -5,7 +5,7 @@ import { OmdbapiExtApiAdapter } from '../../adapters';
 
 @Injectable()
 export class ExtApiAdapterFactory {
-  constructor(private readonly omdbapiExtApiAdapter: OmdbapiExtApiAdapter) {}
+  constructor(public readonly omdbapiExtApiAdapter: OmdbapiExtApiAdapter) {}
 
   chooseAdapter(extApiName: ExtApiNames): ExtApiAdaptersUnion {
     let adapter: ExtApiAdaptersUnion;

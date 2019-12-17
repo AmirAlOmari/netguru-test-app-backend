@@ -14,8 +14,8 @@ import { Comments } from '../../models/comments/comments.model';
 @Injectable()
 export class CommentsService {
   constructor(
-    @InjectModel(Comments) private readonly commentsModel: ReturnModelType<typeof Comments>,
-    @Inject(forwardRef(() => MoviesService)) private readonly moviesService: MoviesService,
+    @InjectModel(Comments) public readonly commentsModel: ReturnModelType<typeof Comments>,
+    @Inject(forwardRef(() => MoviesService)) public readonly moviesService: MoviesService,
   ) {}
 
   async getAll({

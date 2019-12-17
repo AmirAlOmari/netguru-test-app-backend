@@ -2,7 +2,7 @@ import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException, Optio
 
 @Injectable()
 export class DefaultValuePipe<T = any> implements PipeTransform {
-  constructor(@Optional() private readonly defaultValue: T) {}
+  constructor(@Optional() public readonly defaultValue: T) {}
 
   public static create<T>(defaultValue: T) {
     return new this(defaultValue);

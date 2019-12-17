@@ -5,11 +5,11 @@ import { ConfigService } from '../../../config/services/config/config.service';
 
 @Injectable()
 export class AdminOnlyGuard implements CanActivate {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(public readonly configService: ConfigService) {}
 
-  private readonly accessKey = this.configService.get('ACCESS_KEY');
+  public readonly accessKey = this.configService.get('ACCESS_KEY');
 
-  private readonly bearerTokenRegex = /^Bearer (.*)/;
+  public readonly bearerTokenRegex = /^Bearer (.*)/;
 
   async canActivate(context: ExecutionContext) {
     // TODO: REMOVE

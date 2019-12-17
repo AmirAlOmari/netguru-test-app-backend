@@ -27,7 +27,7 @@ import { CommentsService } from '../../services/comments/comments.service';
 @ApiExtraModels(Comments)
 @ApiTags('comments')
 export class CommentsController {
-  constructor(private readonly commentsService: CommentsService) {}
+  constructor(public readonly commentsService: CommentsService) {}
 
   @Post()
   async create(
