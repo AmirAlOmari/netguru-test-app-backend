@@ -1,7 +1,8 @@
 {
   "name": "netguru-test-app",
   "version": "0.0.1",
-  "description": "",
+  "description": "netguru-test-app",
+  "repository": "gitlab:/jkee256/netguru-test-app-backend",
   "author": "",
   "license": "MIT",
   "scripts": {
