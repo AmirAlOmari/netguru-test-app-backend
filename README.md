@@ -21,7 +21,7 @@
 
 #### Steps
 
-1. Create external volumes `$ docker volume create netguru-test-app_app-vol & docker volume create netguru-test-app_mongo-voll`
+1. Create external volumes `$ docker volume create netguru-test-app_app-vol & docker volume create netguru-test-app_mongo-vol`
 2. Build and start `$ docker-compose -f ./docker-compose.staging.yml up -d`
 
 > Project also has live swagger docs. Feel free to open it on `localhost:3000/swagger/`
