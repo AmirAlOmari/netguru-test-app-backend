@@ -51,16 +51,28 @@ export class CommentsService {
     return allCount;
   }
 
+  async populateRecursive(comment: DocumentType<Comments>) {
+    if (comment?.children?.length) {
+      comment.populate('children');
+
+      await comment.execPopulate();
+
+      comment.children = (await Promise.all(
+        comment.children.map(async (childComment: DocumentType<Comments>) => this.populateRecursive(childComment)),
+      )) as any;
+    }
+
+    return comment;
+  }
+
   async getById(
     commentId: string | Types.ObjectId,
     { recursive = false }: { recursive: boolean } = { recursive: false },
   ) {
     const comment = await this.commentsModel.findById(commentId).exec();
 
-    if (recursive && comment.children.length) {
-      comment.populate('children');
-
-      await comment.execPopulate();
+    if (recursive && comment?.children.length) {
+      comment.children = (await this.populateRecursive(comment)).children;
     }
 
     return comment;
@@ -146,13 +158,20 @@ export class CommentsService {
       childrenCommentsTree as Array<DocumentType<Comments> & { children: Array<DocumentType<Comments>> }>,
     );
 
-    const removeCommentsProm = this.commentsModel.deleteMany({ _id: { $in: flattenChildrenCommentIds } }).exec();
+    const commentIdsToRemove = flattenChildrenCommentIds.concat([comment._id]);
+
+    const removeCommentIdsProm = this.commentsModel.deleteMany({ _id: { $in: commentIdsToRemove } }).exec();
 
     const updateParentProm = comment.parent
       ? this.commentsModel.findByIdAndUpdate(comment.parent, { $pull: { children: comment._id } }, { new: true }).exec()
       : Promise.resolve();
 
-    proms.push(removeCommentsProm, updateParentProm);
+    const updateMovieProm = this.moviesService.removeCommentIdsFromMovieById(
+      commentIdsToRemove,
+      comment.movie as Types.ObjectId,
+    );
+
+    proms.push(removeCommentIdsProm, updateParentProm, updateMovieProm);
 
     await Promise.all(proms);
 
