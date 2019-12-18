@@ -9,7 +9,7 @@ import { CommentsModule } from './modules/comments/comments.module';
 
 @Module({
   imports: [ConfigModule, ...moduleConfigs, CommonModule, MoviesModule, CommentsModule],
-  // controllers: [AppController],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
