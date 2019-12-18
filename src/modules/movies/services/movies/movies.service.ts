@@ -111,6 +111,22 @@ export class MoviesService {
     return updatedMovie;
   }
 
+  async removeCommentIdsFromMovieById(commentIds: Array<string | Types.ObjectId>, movieId: string | Types.ObjectId) {
+    const updatedMovie = await this.moviesModel.findByIdAndUpdate(
+      movieId,
+      {
+        $pull: {
+          comments: {
+            $in: commentIds,
+          },
+        },
+      },
+      { new: true },
+    );
+
+    return updatedMovie;
+  }
+
   async createFromThirdParty(createMovieDto: CreateMovieDto) {
     const adapter = this.extApiAdapterFactory.chooseAdapter(createMovieDto.__extApi);
 
@@ -142,7 +158,19 @@ export class MoviesService {
   }
 
   async remove(movie: DocumentType<Movies>) {
-    const proms = [this.removeById(movie._id)];
+    const proms: Array<Promise<any>> = [this.removeById(movie._id)];
+
+    if (movie.comments) {
+      movie.populate('comments');
+
+      await movie.execPopulate();
+
+      const removeCommentsProms = movie.comments.map(comment =>
+        this.commentsService.remove(comment as DocumentType<Comments>),
+      );
+
+      proms.push(...removeCommentsProms);
+    }
 
     return await Promise.all(proms);
   }
