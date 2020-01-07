@@ -15,3 +15,6 @@ deploy_heroku:
     - dpl --provider=heroku --app=$HEROKU_APP_NAME --api-key=$HEROKU_API_KEY
   only:
     - master
+  environment:
+    name: heroku-1
+    url: https://amir-netguru-test-app-1.herokuapp.com/
